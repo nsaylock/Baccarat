@@ -15,42 +15,107 @@ class Card:
 def main():
     deck = []
     initializeDeck(deck)
-    for i, card in enumerate(deck):     #Displays the deck for testing purposes
-        printCard(card)
-        if (i + 1) % 13 == 0:
-            print("")
-    print("")
+  
                         # Round Start
 
-    playerHand = []
     bankerHand = []
-
+    playerHand = []
+    bankerTotal = 0
+    playerTotal = 0
+    naturalStand = False
+    playerThirdCard = 100
+    
     dealCard(deck, playerHand)
     dealCard(deck, bankerHand)
     dealCard(deck, playerHand)
     dealCard(deck, bankerHand)
+    playerTotal = calculateTotal(playerHand)
+    bankerTotal = calculateTotal(bankerHand)
+    playerInitTotal = playerTotal
 
-    print("BANKER               PLAYER")
-    printCard(bankerHand[0])
-    printCard(bankerHand[1])
-    print("             ",end="")
-    printCard(playerHand[0])
-    printCard(playerHand[1])
-    print("             ")
+    displayTable(bankerHand, playerHand, bankerTotal, playerTotal)
+    input("Press Enter to Continue")
 
-    for i in range(59):
-        dealCard(deck, playerHand)
-        printCard(playerHand[i])
+    # Natural Stand
+    if bankerTotal > 7 or playerTotal > 7:
+        naturalStand = True
+
+    # Player Decision tree
+    if not(naturalStand):
+        if playerTotal >= 0 and playerTotal < 6:
+            dealCard(deck, playerHand)
+            playerThirdCard = playerHand[2].value
+            playerTotal = calculateTotal(playerHand)
+            displayTable(bankerHand, playerHand, bankerTotal, playerTotal)
+            input("Press Enter to Continue")
+
+    # Banker decision tree
+    if not(naturalStand):
+        if playerThirdCard != 100:
+            if bankerTotal >= 0 and bankerTotal < 3:
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+            elif bankerTotal == 3 and playerThirdCard != 8:
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+            elif bankerTotal == 4 and (playerThirdCard < 8):
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+            elif bankerTotal == 5 and (playerThirdCard > 3 and playerThirdCard < 8):
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+            elif bankerTotal == 6 and (playerThirdCard > 5 and playerThirdCard < 8):
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+        else:
+            if bankerTotal >= 0 and bankerTotal < 6:
+                dealCard(deck, bankerHand)
+                bankerTotal = calculateTotal(bankerHand)
+        displayTable(bankerHand, playerHand, bankerTotal, playerTotal)
+        input("Press Enter to Continue")
+
+    compareHands(bankerTotal, playerTotal)
+
+
+
 
     print("\n")
-    for i, card in enumerate(deck):     #Displays the deck for testing purposes
-        printCard(card)
-        if (i + 1) % 13 == 0:
-            print("")
-    print("\n",end="\n")
-                  
 
+#^ Main indent level
 ####################### END OF MAIN() ##############################
+
+def compareHands(btotal, ptotal):
+    if btotal == ptotal:
+        print("Push")
+    elif btotal > ptotal:
+        print("Banker Wins")
+    elif btotal < ptotal:
+        print("Player Wins")
+
+def calculateTotal(hand):
+    total = 0
+    for card in hand:
+        total += card.value
+        if total >= 10:
+            total -= 10
+    if total == 10:
+        total = 0
+    return total
+    
+
+def displayTable(bhand, phand, btotal, ptotal):
+    print("PLAYER               BANKER")
+    cardSpaces = 1
+    for card in phand:
+        printCard(card)
+        cardSpaces += len(card.name)
+    if len(phand) == 3:
+        cardSpaces += 1
+    for i in range(20 - cardSpaces):
+        print(" ",end="")
+    for card in bhand:
+        printCard(card)
+    print("\nTotal:",ptotal,"            Total:",btotal)
 
 def dealCard(deck, hand):
     if len(deck) == 0:
@@ -78,21 +143,20 @@ def initializeDeck(deck):
 
 def printCard(card):
     lastChar = len(card.name) - 1
-    if len(card.name) == 2:
+    if lastChar == 1:
         print(card.name[0], end="")
-    elif len(card.name) == 3:
-        print(card.name[0:1], end="")
+    elif lastChar == 2:
+        print(card.name[0:2], end="")
 
     if card.name[lastChar] == "S":
-        print("\u2660", end="")
+        print("\u2660", end=" ")
     elif card.name[lastChar] == "C":
-        print("\u2663", end="")
+        print("\u2663", end=" ")
     elif card.name[lastChar] == "H":
-        print("\u2665", end="")
+        print("\u2665", end=" ")
     else:
-        print("\u2666", end="")
+        print("\u2666", end=" ")
 
-    print(" ", end="")
 
 
 
