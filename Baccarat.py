@@ -97,7 +97,7 @@ def main():
                     bankerTotal = calculateTotal(bankerHand)
             displayTable(bankerHand, playerHand, bankerTotal, playerTotal, betSide, bet, bankroll)
 
-        compareHands(bankerTotal, playerTotal)
+        bankroll = compareHands(bankerTotal, playerTotal, betSide, bet, bankroll)
 
         print("\n")
     #^ End of While loop
@@ -109,13 +109,29 @@ def main():
 #^ Main indent level
 ####################### END OF MAIN() ##############################
 
-def compareHands(btotal, ptotal):
+def compareHands(btotal, ptotal, betSide, bet, bankroll):
     if btotal == ptotal:
         print("Push")
+        print("Bankroll: $",bankroll)
     elif btotal > ptotal:
         print("Banker Wins")
+        print("Bankroll: $",bankroll,end="")
+        if betSide == "b":
+            bankroll += round(bet*0.95)
+            print(" + $", round(bet*0.95))
+        else:
+            bankroll -= bet
+            print(" - $", bet)
     elif btotal < ptotal:
         print("Player Wins")
+        print("Bankroll: $",bankroll,end="")
+        if betSide == "b":
+            bankroll -= bet
+            print(" - $", bet)
+        else:
+            bankroll += bet
+            print(" + $", bet)
+    return bankroll
 
 def calculateTotal(hand):
     total = 0
@@ -196,7 +212,7 @@ def displayTable(bhand, phand, btotal, ptotal, betSide, bet, bankroll):
 
     print("\nBankroll: $", bankroll)
 
-    input("\nPress Enter to Continue")
+    input("\n-----------------------------------------------------------")
 
 def spaces(phand):   #Spaces between player ---> banker cards
     if len(phand) == 3:
