@@ -19,7 +19,8 @@ def main():
     print("------------- Parameters ----------------")
     numOfDecks = int(input("Number of decks: "))
     bet = int(input("Bet Amount: $"))
-    iterations = int(input("Number of Iterations: "))
+    interval = int(input("Interval of Study: "))
+    iterations = 25
     betSide = input("Choose betting side: Player, Banker, or Random (p/b/r): ")
     betRandom = "q"
     while betSide != "p" and betSide != "b" and betSide != "r":
@@ -29,19 +30,24 @@ def main():
     if betSide == "r":
         betRandom = "r"
     repeat = "y"
-    
-    while repeat == "y":
+    finalBankroll = []
+    positiveOutcome = 0
+    negativeOutcome = 0
+
+    for j in range(interval*4):
         gamesWon = 0
         gamesLost = 0
         push = 0
         bankerWon = 0
         playerWon = 0
         bankroll = 0
+        
         plotBankroll = [0]
         deck = []
         initializeDeck(deck, numOfDecks)
         # displayInitialDeck()
         
+      
         for game in range(iterations):
             bankerHand = []
             playerHand = []
@@ -117,13 +123,32 @@ def main():
                 push += 1
                 
 
-        #^ End of for loop
-        fig, money = plt.subplots()
-        money.plot(plotBankroll)
-        money.set_ylabel("Bankroll")
-        money.set_xlabel("Hand #")
-        plt.show()
+        #^ End of for iterations loop
+        if bankroll > 0:
+            positiveOutcome += 1
+        elif bankroll < 0:
+            negativeOutcome += 1
 
+        if j+1 == interval:
+            data25 = [positiveOutcome, negativeOutcome]
+            iterations *= 10
+            positiveOutcome = 0
+            negativeOutcome = 0
+        elif j+1 == interval*2:
+            data125 = [positiveOutcome, negativeOutcome]
+            iterations *= 10
+            positiveOutcome = 0
+            negativeOutcome = 0
+        elif j+1 == interval*3:
+            data225 = [positiveOutcome, negativeOutcome]
+            iterations *= 10
+            positiveOutcome = 0
+            negativeOutcome = 0
+        elif j+1 == interval*4:
+            data325 = [positiveOutcome, negativeOutcome]
+            iterations *= 2
+            positiveOutcome = 0
+            negativeOutcome = 0
        
         print("----------- OUTCOMES -------------------")
         print("Simulated", iterations, "games of Baccarat")
@@ -132,9 +157,9 @@ def main():
         print("Games Lost: ", gamesLost)
         print("Banker Odds %", bankerWon/(iterations-push)*100)
         print("Player Odds %", playerWon/(iterations-push)*100)
-        repeat = input("Repeat? ")
-        if repeat != "y":
-            break
+        #repeat = input("Repeat? ")
+        #if repeat != "y":
+        #    break
         if betRandom == "r":
             betSide = "r"
         print("------------- Parameters ----------------")
@@ -142,6 +167,31 @@ def main():
         print("Bet Amount: $", bet)
         print("Number of Iterations: ", iterations)
         print("Betting side:", betSide)
+
+    outcomes = {
+        'Positive': (data25[0], data125[0], data225[0], data325[0]),
+        'Negative': (data25[1], data125[1], data225[1], data325[1])
+    }
+
+    x = np.arange(4)
+    width = 0.25
+    multiplier = 0
+
+    fig, ax = plt.subplots(layout='constrained')
+
+    for group, outcome in outcomes.items():
+        offset = width * multiplier
+        rects = ax.bar(x + offset, outcome, width, label=group)
+        ax.bar_label(rects, padding=3)
+        multiplier += 1
+
+    ax.set_title("Baccarat: Wins vs. Losses for # Hands Played")
+    ax.set_ylabel("Outcomes of x hands played")
+    ax.set_xlabel("# of Hands Played per Inteval")
+    ax.set_xticks(x + width, ["25", '250', '2500', '5000'])
+    ax.legend(loc='upper left', ncols=2)
+
+    plt.show()
 
 #^ Main indent level
 ####################### END OF MAIN() ##############################
