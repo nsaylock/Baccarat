@@ -26,7 +26,7 @@ def main():
     bet = 1
 
     # Start the while loop
-    while bankroll > 0 and bet > 0:
+    while bankroll > 60 and bet > 0:
         bankerHand = []
         playerHand = []
         bankerTotal = 0
@@ -41,8 +41,10 @@ def main():
                 print("Invalid Input. Try Again")
 
         bet = int(input("Place Bet: $"))
+        if bet == 0:
+            break
         while bet < 60 or bet > bankroll:
-            if bet < 60:
+            if bet < 60 and bet > 0:
                 print("Minimum bet is $60")
                 bet = int(input("Try another amount: $"))
             elif bet > bankroll:
@@ -101,9 +103,9 @@ def main():
 
         print("\n")
     #^ End of While loop
-    if bankroll == 0:
-        print("You ran out of money, better luck next time")
-    else:
+    if bankroll < 60:
+        print("You can no longer bet the minimum, better luck next time")
+    elif bet == 0:
         print("Player Quit")
 
 #^ Main indent level
